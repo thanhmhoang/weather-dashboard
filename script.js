@@ -2,10 +2,28 @@ var currentCityTitle = document.querySelector("#current-city");
 var currentTemp = document.querySelector("#temperature");
 var currentHumidity = document.querySelector("#humidity");
 var currentWind = document.querySelector("#wind-speed");
+var searchBtn = document.querySelector("#button-addon2");
+var searchInput =document.querySelector("#search-input");
+dayjs.extend(window.dayjs_plugin_utc)
+dayjs.extend(window.dayjs_plugin_timezone)
 
 function getWeather (lat,lon) {
-  
-
+var currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=8d31f65d830eb3f31dc7c23c8cacb3bc` 
+fetch(currentWeatherURL)
+.then(function (response) {
+  return response.json();
+})
+.then(function(data) {
+  console.log(data)
+  var today = dayjs().format('MM/DD/YYYY');
+  currentCityTitle.textContent = `${data.name} ${today}`
+  var weatherIcon = document.querySelector("#currentweather-icon");
+  var iconURL = "https://openweathermap.org/img/w/"+data.weather[0].icon+".png"
+  weatherIcon.setAttribute("src", iconURL)
+  currentTemp.textContent = "Temperature: " + data.main.temp + " \xB0F"
+  currentHumidity.textContent = "Humidity: " + data.main.humidity + " %"
+  currentWind.textContent = "Wind Speed: " + data.wind.speed + " MPH"
+}) 
 
 fetch('https://api.openweathermap.org/data/2.5/forecast?units=imperial&lat='+lat+'&lon='+lon+'&appid=8d31f65d830eb3f31dc7c23c8cacb3bc')
   .then(function (response) {
@@ -14,13 +32,10 @@ fetch('https://api.openweathermap.org/data/2.5/forecast?units=imperial&lat='+lat
   .then(function (data) {
     // console.log(data.city.name)
     console.log(data);
-    currentCityTitle.textContent = data.city.name
-    currentTemp.textContent = "Temperature: " + data.list[0].main.temp 
-    currentHumidity.textContent = "Humidity: " + data.list[0].main.humidity + "%"
-    currentWind.textContent = data.list[0]
+    
     for (var i = 0; i < data.list.length; i+=8) {
       console.log(data.list[i])
-      
+
     }
   });
 }
@@ -38,5 +53,16 @@ function getCoord (cityName) {
   });
 }
 
-getCoord ("Seattle");
+function submitSearch () {
+  var city = searchInput.value
+  console.log(city)
+  getCoord(city)
+}
 
+// Code to get current day
+
+
+
+
+
+searchBtn.onclick = submitSearch
